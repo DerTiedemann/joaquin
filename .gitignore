@@ -20,7 +20,9 @@
 /Godeps/
 
 /bin/
-
+/packer/env
 .idea
+
+hcloud
 
 # End of https://www.gitignore.io/api/go

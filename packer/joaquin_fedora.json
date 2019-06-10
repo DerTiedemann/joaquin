@@ -1,0 +1,52 @@
+{
+  "variables": {
+    "hcloud_token": "{{env `HCLOUD_TOKEN`}}"
+  },
+  "sensitive-variables": ["hcloud_token"],
+  "builders": [
+    {
+      "type": "hcloud",
+      "token": "{{user `hcloud_token`}}",
+      "image": "fedora-29",
+      "location": "nbg1",
+      "server_type": "cx11",
+      "ssh_username": "root",
+      "snapshot_name": "joaquin-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell-local",
+      "command": "make build_linux"
+    },
+    {
+      "type": "shell",
+      "script": "packer/scripts/secure_linux.sh"
+    },
+    {
+      "type": "shell",
+      "inline": ["mkdir -p /opt/joaquin"]
+    },
+    {
+      "type": "file",
+      "source": "bin/joaquin_linux",
+      "destination": "/opt/joaquin/joaquin",
+      "generated": true
+    },
+    {
+      "type": "file",
+      "source": "packer/env",
+      "destination": "/opt/joaquin/env"
+    },
+    {
+      "type": "file",
+      "source": "packer/joaquin.service",
+      "destination": "/etc/systemd/system/joaquin.service"
+    },
+    {
+      "type": "shell",
+      "inline": ["systemctl enable joaquin"]
+    }
+  ]
+
+}
